@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    name: multidb-postgres-ds
+    url: jdbc:postgresql://localhost:55432/multidb
+    username: multidbuser
+    password: multidbpass
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true

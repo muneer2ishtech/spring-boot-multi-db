@@ -1,0 +1,17 @@
+spring:
+  datasource:
+    name: multidb-h2-ds
+    url: jdbc:h2:mem:multidb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=TRUE;MODE=MYSQL;NON_KEYWORDS=year
+    username: multidbuser
+    password: multidbpass
+    driver-class-name: org.h2.Driver
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+  h2:
+    console:
+      enabled: true

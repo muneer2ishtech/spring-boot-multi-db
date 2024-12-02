@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    name: multidb-mysql-ds
+    url: jdbc:mysql://localhost:53306/multidb
+    username: multidbuser
+    password: multidbpass
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
