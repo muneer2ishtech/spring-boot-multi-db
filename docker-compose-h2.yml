@@ -10,7 +10,7 @@ services:
     image: muneer2ishtech/ishtech-springboot-multidb-app:${APP_VERSION:+$APP_VERSION-}h2
     container_name: ishtech_springboot_multidb_app_h2
     environment:
-      - SPRING_PROFILES_ACTIVE=h2
+      SPRING_PROFILES_ACTIVE: h2
     ports:
       - "${SERVER_PORT_H2:-${SERVER_PORT:-8080}}:${SERVER_PORT_H2:-${SERVER_PORT:-8080}}"
     healthcheck:

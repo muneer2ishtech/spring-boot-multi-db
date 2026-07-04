@@ -10,8 +10,8 @@ services:
     image: muneer2ishtech/ishtech-springboot-multidb-app:${APP_VERSION:+$APP_VERSION-}postgres
     container_name: ishtech_springboot_multidb_app_postgres
     environment:
-      - SPRING_PROFILES_ACTIVE=postgres
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://ishtech-springboot-multidb-db-postgres:5432/multidb
+      SPRING_PROFILES_ACTIVE: postgres
+      SPRING_DATASOURCE_URL: jdbc:postgresql://ishtech-springboot-multidb-db-postgres:5432/multidb
     ports:
       - "${SERVER_PORT_POSTGRES:-${SERVER_PORT:-8080}}:${SERVER_PORT_POSTGRES:-${SERVER_PORT:-8080}}"
     depends_on:
@@ -27,9 +27,9 @@ services:
     image: postgres:18
     container_name: ishtech_springboot_multidb_db_postgres
     environment:
-      - POSTGRES_DB=multidb
-      - POSTGRES_USER=multidbuser
-      - POSTGRES_PASSWORD=multidbpass
+      POSTGRES_DB: multidb
+      POSTGRES_USER: multidbuser
+      POSTGRES_PASSWORD: multidbpass
     ports:
       - "${DB_PORT_POSTGRES:-${DB_PORT:-5432}}:5432"
     volumes:

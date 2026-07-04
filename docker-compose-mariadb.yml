@@ -10,8 +10,8 @@ services:
     image: muneer2ishtech/ishtech-springboot-multidb-app:${APP_VERSION:+$APP_VERSION-}mariadb
     container_name: ishtech_springboot_multidb_app_mariadb
     environment:
-      - SPRING_PROFILES_ACTIVE=mariadb
-      - SPRING_DATASOURCE_URL=jdbc:mariadb://ishtech-springboot-multidb-db-mariadb:3306/multidb
+      SPRING_PROFILES_ACTIVE: mariadb
+      SPRING_DATASOURCE_URL: jdbc:mariadb://ishtech-springboot-multidb-db-mariadb:3306/multidb
     ports:
       - "${SERVER_PORT_MARIADB:-${SERVER_PORT:-8080}}:${SERVER_PORT_MARIADB:-${SERVER_PORT:-8080}}"
     depends_on:
@@ -27,10 +27,10 @@ services:
     image: mariadb:lts
     container_name: ishtech_springboot_multidb_db_mariadb
     environment:
-      - MYSQL_ROOT_PASSWORD=Qwer4321
-      - MYSQL_DATABASE=multidb
-      - MYSQL_USER=multidbuser
-      - MYSQL_PASSWORD=multidbpass
+      MYSQL_ROOT_PASSWORD: Qwer4321
+      MYSQL_DATABASE: multidb
+      MYSQL_USER: multidbuser
+      MYSQL_PASSWORD: multidbpass
     ports:
       - "${DB_PORT_MARIADB:-${DB_PORT:-3306}}:3306"
     volumes:

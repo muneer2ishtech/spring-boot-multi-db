@@ -10,5 +10,5 @@ logging:
   level:
     root: INFO
     fi.ishtech: DEBUG
-    fi.ishtech.practice.multidb: TRACE
+    fi.ishtech.practice.springboot.multidb: TRACE
 

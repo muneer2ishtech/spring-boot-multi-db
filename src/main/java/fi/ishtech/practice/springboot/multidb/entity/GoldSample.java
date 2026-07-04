@@ -1,4 +1,4 @@
-package fi.ishtech.practice.multidb.entity;
+package fi.ishtech.practice.springboot.multidb.entity;
 
 import java.io.Serial;
 import java.io.Serializable;

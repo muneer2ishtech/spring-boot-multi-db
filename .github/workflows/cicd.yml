@@ -1,0 +1,155 @@
+# Build, test a Maven project and release as Docker image.
+## see: https://docs.github.com/en/actions/tutorials/build-and-test-code/java-with-maven
+## see: https://docs.github.com/en/actions/tutorials/publish-packages/publish-docker-images
+
+name: Java CI with Maven and Docker
+
+on:
+  push:
+    branches: ['**']
+    tags: ['v[0-9]+.[0-9]+.[0-9]+']
+
+  workflow_dispatch:
+    inputs:
+      manual_deploy:
+        description: "Trigger manual deployment"
+        required: true
+        type: choice
+        options:
+          - "false"
+          - "true"
+        default: "false"
+
+jobs:
+  maven-docker-build:
+    runs-on: ubuntu-latest
+
+    env:
+      MAVEN_CLI_OPTS: "-B -q"
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Set up JDK 25 + Maven cache
+        uses: actions/setup-java@v5
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          cache: maven
+
+      # 1. Validate version against branch / release tag
+      - name: Validate Project Version
+        id: validate-project-version
+        env:
+          MANUAL_DEPLOY: ${{ inputs.manual_deploy }}
+        run: |
+          chmod +x mvnw
+          APP_VERSION=$(./mvnw help:evaluate -Dexpression=project.version -q -DforceStdout 2>/dev/null)
+          echo "app_version=$APP_VERSION" >> "$GITHUB_OUTPUT"
+          echo "Event=$GITHUB_EVENT_NAME  Ref=$GITHUB_REF_NAME ($GITHUB_REF_TYPE)  Version=$APP_VERSION"
+
+          # ---------- RELEASE RULE ----------
+          if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
+            if [[ "$APP_VERSION" == *-SNAPSHOT ]]; then
+              echo "❌ ERROR: Tagged version cannot be SNAPSHOT. Found: $APP_VERSION"
+              exit 1
+            fi
+            if [[ "${GITHUB_REF_NAME#v}" != "$APP_VERSION" ]]; then
+              echo "❌ ERROR: Tag ($GITHUB_REF_NAME) does NOT match pom version ($APP_VERSION)"
+              exit 1
+            fi
+
+          # ---------- PUSH / BRANCH RULE ----------
+          elif [[ "$GITHUB_REF_TYPE" == "branch" ]]; then
+
+            # ---------- MAIN ----------
+            if [[ "$GITHUB_REF_NAME" == "main" ]]; then
+              if [[ "$APP_VERSION" == *-SNAPSHOT ]]; then
+                echo "❌ ERROR: main branch must use RELEASE version (no -SNAPSHOT). Found: $APP_VERSION"
+                exit 1
+              fi
+              if [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" && "$MANUAL_DEPLOY" == "true" ]]; then
+                echo "❌ ERROR: main can only be released via version tag, not manual deploy."
+                exit 1
+              fi
+
+            # ---------- DEV or ANY OTHER BRANCH ----------
+            else
+              if [[ "$APP_VERSION" != *-SNAPSHOT ]]; then
+                echo "❌ ERROR: Non-main branches must use SNAPSHOT version. Found: $APP_VERSION"
+                exit 1
+              fi
+            fi
+          fi
+
+          # Decide whether this run releases
+          DO_RELEASE=false
+          if [[ "$GITHUB_REF_TYPE" == "tag" ]]; then
+            DO_RELEASE=true
+          elif [[ "$GITHUB_EVENT_NAME" == "workflow_dispatch" && "$MANUAL_DEPLOY" == "true" && "$GITHUB_REF_NAME" != "main" ]]; then
+            DO_RELEASE=true
+          fi
+
+          echo "✔ Validation passed (do_release=$DO_RELEASE)"
+          echo "do_release=$DO_RELEASE" >> "$GITHUB_OUTPUT"
+
+      # 2. Compile
+      - name: Maven Compile
+        run: ./mvnw $MAVEN_CLI_OPTS clean compile -P h2
+
+      # 3. Test
+      - name: Maven Test
+        run: ./mvnw $MAVEN_CLI_OPTS test -Dmaven.main.skip=true -P h2
+
+      # 4. Release (only when conditions match)
+      - name: Login to Docker Hub
+        if: steps.validate-project-version.outputs.do_release == 'true'
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Build and push Docker image (h2)
+        if: steps.validate-project-version.outputs.do_release == 'true'
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          build-args: |
+            DB_TO_USE=h2
+          tags: muneer2ishtech/ishtech-springboot-multidb-app:${{ steps.validate-project-version.outputs.app_version }}-h2
+
+      - name: Build and push Docker image (postgres)
+        if: steps.validate-project-version.outputs.do_release == 'true'
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          build-args: |
+            DB_TO_USE=postgres
+          tags: muneer2ishtech/ishtech-springboot-multidb-app:${{ steps.validate-project-version.outputs.app_version }}-postgres
+
+      - name: Build and push Docker image (mysql)
+        if: steps.validate-project-version.outputs.do_release == 'true'
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          build-args: |
+            DB_TO_USE=mysql
+          tags: muneer2ishtech/ishtech-springboot-multidb-app:${{ steps.validate-project-version.outputs.app_version }}-mysql
+
+      - name: Build and push Docker image (mariadb)
+        if: steps.validate-project-version.outputs.do_release == 'true'
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          build-args: |
+            DB_TO_USE=mariadb
+          tags: muneer2ishtech/ishtech-springboot-multidb-app:${{ steps.validate-project-version.outputs.app_version }}-mariadb

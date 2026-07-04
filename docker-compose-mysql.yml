@@ -10,8 +10,8 @@ services:
     image: muneer2ishtech/ishtech-springboot-multidb-app:${APP_VERSION:+$APP_VERSION-}mysql
     container_name: ishtech_springboot_multidb_app_mysql
     environment:
-      - SPRING_PROFILES_ACTIVE=mysql
-      - SPRING_DATASOURCE_URL=jdbc:mysql://ishtech-springboot-multidb-db-mysql:3306/multidb
+      SPRING_PROFILES_ACTIVE: mysql
+      SPRING_DATASOURCE_URL: jdbc:mysql://ishtech-springboot-multidb-db-mysql:3306/multidb
     ports:
       - "${SERVER_PORT_MYSQL:-${SERVER_PORT:-8080}}:${SERVER_PORT_MYSQL:-${SERVER_PORT:-8080}}"
     depends_on:
@@ -27,10 +27,10 @@ services:
     image: mysql:lts
     container_name: ishtech_springboot_multidb_db_mysql
     environment:
-      - MYSQL_ROOT_PASSWORD=Qwer4321
-      - MYSQL_DATABASE=multidb
-      - MYSQL_USER=multidbuser
-      - MYSQL_PASSWORD=multidbpass
+      MYSQL_ROOT_PASSWORD: Qwer4321
+      MYSQL_DATABASE: multidb
+      MYSQL_USER: multidbuser
+      MYSQL_PASSWORD: multidbpass
     ports:
       - "${DB_PORT_MYSQL:-${DB_PORT:-3306}}:3306"
     volumes:

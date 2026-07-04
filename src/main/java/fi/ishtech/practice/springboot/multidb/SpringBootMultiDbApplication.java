@@ -1,4 +1,4 @@
-package fi.ishtech.practice.multidb;
+package fi.ishtech.practice.springboot.multidb;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

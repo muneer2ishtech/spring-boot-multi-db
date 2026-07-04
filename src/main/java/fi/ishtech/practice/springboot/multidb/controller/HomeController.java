@@ -1,4 +1,4 @@
-package fi.ishtech.practice.multidb.controller;
+package fi.ishtech.practice.springboot.multidb.controller;
 
 import java.io.IOException;
 import java.sql.DatabaseMetaData;
@@ -16,8 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import fi.ishtech.practice.multidb.SpringBootMultiDbApplication;
-
+import fi.ishtech.practice.springboot.multidb.SpringBootMultiDbApplication;
 import lombok.extern.slf4j.Slf4j;
 
 /**
